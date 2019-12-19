@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class DetailsVC: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
@@ -59,6 +60,36 @@ class DetailsVC: UIViewController, UINavigationControllerDelegate, UIImagePicker
     
     
     @IBAction func saveButtonTapped(_ sender: Any) {
+        
+        //To store in Core Data First Create a appDelegate and context constants
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        
+        //Next create a cconstant that points to your Entity you created (in this case it is called Photos)
+        let newPicture = NSEntityDescription.insertNewObject(forEntityName: "Photos", into: context)
+        
+        //Attributes - here we will set values
+        newPicture.setValue(itemTextField.text, forKey: "item")
+        newPicture.setValue(detailsTextView.text, forKey: "details")
+        newPicture.setValue(UUID(), forKey: "id")
+        //Saving year will need to be converted since year is an Int and not a String
+        if let year = Int(yearTextField.text!) {
+            newPicture.setValue(year, forKey: "year")
+        }
+        
+        //to set the picture save it as DATA first
+        let data = imageView.image?.jpegData(compressionQuality: 0.5)
+        newPicture.setValue(data, forKey: "image")
+        
+        
+        //Now perform a Do Catch and save the context (you must do this because it can THROW an error)
+        
+        do {
+            try context.save()
+            print("Success")
+        }catch {
+            print("error")
+        }
     
     }
     
